@@ -1,2 +1,3 @@
 # Welcome to Wayfinder!
 
+The goal of Wayfinder is to bring people together and enrich the communities' ties with one another. To do this, multiple users are incentivized to come together at one location. Once they are there, they are free to chat, play games, etc. But don't forget to take a picture together at the end and upload it! Once the photo(s) (with all participants in it) is/are uploaded, all users will receive in-game points! As well as other various rewards depending on whether or not they organized the event, participated in a large-scale event, or visited a location with new people!
