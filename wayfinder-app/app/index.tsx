@@ -1,5 +1,6 @@
-import { Text, View, TouchableOpacity, Alert, ActivityIndicator } from "react-native";
+import { Text, View, TouchableOpacity, Alert, ActivityIndicator, StyleSheet } from "react-native";
 import { useState, useEffect } from "react";
+import { router } from 'expo-router';
 import { waypointService } from "../services/firebaseService";
 import { useAuth } from "../contexts/AuthContext";
 import AuthScreen from "../components/AuthScreen";
@@ -103,16 +104,22 @@ export default function Index() {
       
       <TouchableOpacity
         onPress={addSampleWaypoint}
-        style={{
-          backgroundColor: "#007AFF",
-          padding: 15,
-          borderRadius: 8,
-          marginBottom: 20,
-        }}
+        style={styles.button}
       >
-        <Text style={{ color: "white", fontWeight: "bold" }}>
+        <Text style={styles.buttonText}>
           Add Sample Waypoint
         </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity 
+        style={styles.mapButton}
+        onPress={() => router.push('./map')}
+      >
+        <Text style={styles.mapButtonText}>🗺️ View Map</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={logout} style={styles.logoutButton}>
+        <Text style={styles.logoutButtonText}>Logout</Text>
       </TouchableOpacity>
 
       <Text style={{ fontSize: 12, color: "gray", textAlign: "center" }}>
@@ -122,3 +129,41 @@ export default function Index() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  button: {
+    backgroundColor: "#007AFF",
+    padding: 15,
+    borderRadius: 8,
+    marginBottom: 10,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: "white",
+    fontWeight: "bold",
+  },
+  mapButton: {
+    backgroundColor: '#34C759',
+    padding: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  mapButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  logoutButton: {
+    backgroundColor: '#FF3B30',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  logoutButtonText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+});
