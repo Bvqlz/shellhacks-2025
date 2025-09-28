@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Alert, Text, TouchableOpacity, TextInput, Modal, Platform, Pressable } from 'react-native';
 import MapView, { Marker, Region } from 'react-native-maps';
 import * as Location from 'expo-location';
+import { router } from 'expo-router';
 import { useAuth } from '../contexts/AuthContext';
 import { waypointService } from '../services/firebaseService';
 import WaypointPopup from '../components/WaypointPopup';
@@ -15,11 +16,10 @@ interface Waypoint {
   description: string;
   createdAt: string;
   createdBy: string;
-  attendees: string[]; // Array of user IDs who are attending
 }
 
 export default function MapScreen() {
-  const { user } = useAuth();
+  const { user, logout, loading: authLoading } = useAuth();
   const [region, setRegion] = useState<Region | null>(null);
   const [waypoints, setWaypoints] = useState<Waypoint[]>([]);
   const [userLocation, setUserLocation] = useState<Location.LocationObject | null>(null);
@@ -82,6 +82,14 @@ export default function MapScreen() {
       }
     })();
   }, []);
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!user && !authLoading) {
+      router.replace('./');
+      return;
+    }
+  }, [user, authLoading]);
 
   // Load waypoints
   useEffect(() => {
@@ -318,8 +326,8 @@ export default function MapScreen() {
         ))}
       </MapView>
       
-      <TouchableOpacity style={styles.refreshButton} onPress={loadWaypoints}>
-        <Text style={styles.refreshButtonText}>Refresh Waypoints</Text>
+      <TouchableOpacity style={styles.logoutButton} onPress={logout}>
+        <Text style={styles.logoutButtonText}>Logout</Text>
       </TouchableOpacity>
 
       {/* Add Waypoint Modal */}
@@ -424,11 +432,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 10,
   },
-  refreshButton: {
+  logoutButton: {
     position: 'absolute',
     bottom: 50,
     right: 20,
-    backgroundColor: '#007AFF',
+    backgroundColor: '#FF3B30',
     padding: 12,
     borderRadius: 25,
     elevation: 5,
@@ -437,7 +445,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
   },
-  refreshButtonText: {
+  logoutButtonText: {
     color: 'white',
     fontSize: 14,
     fontWeight: 'bold',

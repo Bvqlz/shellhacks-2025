@@ -8,7 +8,7 @@ export default function RootLayout() {
         <Stack.Screen 
           name="index" 
           options={{ 
-            title: "Waypoints",
+            title: "Wayfinder",
             headerStyle: { backgroundColor: '#007AFF' },
             headerTintColor: '#fff'
           }} 
@@ -16,7 +16,7 @@ export default function RootLayout() {
         <Stack.Screen 
           name="map" 
           options={{ 
-            title: "Map View",
+            title: "Wayfinder - Map",
             headerStyle: { backgroundColor: '#007AFF' },
             headerTintColor: '#fff'
           }} 
