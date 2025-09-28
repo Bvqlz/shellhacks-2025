@@ -15,12 +15,14 @@ interface AuthScreenProps {
   onAuthSuccess: () => void;
 }
 
+// login and signup form component that switches between modes
 export default function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isLogin, setIsLogin] = useState(true); // true = login, false = register
+  const [isLogin, setIsLogin] = useState(true); // toggles between login and register mode
   const [loading, setLoading] = useState(false);
 
+  // handles both login and registration based on current mode
   const handleAuth = async () => {
     if (!email.trim() || !password.trim()) {
       Alert.alert('Error', 'Please fill in all fields');

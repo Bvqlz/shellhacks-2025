@@ -11,7 +11,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '../config/firebase';
 
-// Types for our data
+// data structures for waypoints and favorites stored in firebase
 interface Waypoint {
   id: string;
   userId: string;
@@ -30,9 +30,9 @@ interface Favorite {
   createdAt: string;
 }
 
-// Simple service for managing waypoints/locations
+// main service for handling all waypoint database operations
 export const waypointService = {
-  // Add a new waypoint for a specific user (all waypoints are public)
+  // creates a new waypoint in firebase with user info and coordinates
   async addWaypoint(userId: string, name: string, latitude: number, longitude: number, description?: string, createdBy?: string) {
     try {
       const docRef = await addDoc(collection(db, 'waypoints'), {
@@ -52,7 +52,7 @@ export const waypointService = {
     }
   },
 
-  // Get waypoints for a specific user
+  // fetches only waypoints created by a specific user
   async getUserWaypoints(userId: string) {
     try {
       const querySnapshot = await getDocs(collection(db, 'waypoints'));
@@ -78,7 +78,7 @@ export const waypointService = {
     }
   },
 
-  // Get all waypoints (all waypoints are public)
+  // gets all waypoints from database since they're all public
   async getAllVisibleWaypoints(userId: string) {
     try {
       const querySnapshot = await getDocs(collection(db, 'waypoints'));
@@ -87,14 +87,14 @@ export const waypointService = {
       querySnapshot.forEach((doc) => {
         const data = doc.data();
         
-        // All waypoints are public, so return all waypoints
+        // all waypoints are public so everyone can see them
         waypoints.push({
           id: doc.id,
           ...data
         } as Waypoint);
       });
       
-      // Sort by creation date (newest first)
+      // sort by newest first
       waypoints.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
       
       return waypoints;
@@ -104,7 +104,7 @@ export const waypointService = {
     }
   },
 
-  // Create waypoint from form data (easy for your teammate to use)
+  // alternative way to create waypoint using structured form data with validation
   async createWaypointFromForm(formData: {
     userId: string;
     name: string;
@@ -150,7 +150,7 @@ export const waypointService = {
     }
   },
 
-  // Update an existing waypoint
+  // modifies existing waypoint but only if user owns it
   async updateWaypoint(waypointId: string, userId: string, updates: {
     name?: string;
     latitude?: number;
@@ -204,10 +204,10 @@ export const waypointService = {
     }
   },
 
-  // Delete a waypoint
+  // removes waypoint from database but only if user owns it
   async deleteWaypoint(waypointId: string, userId: string) {
     try {
-      // First check if the waypoint belongs to the user
+      // check ownership before allowing deletion
       const waypointDoc = await getDoc(doc(db, 'waypoints', waypointId));
       
       if (!waypointDoc.exists()) {
@@ -242,9 +242,9 @@ export const waypointService = {
   },
 };
 
-// Simple service for user favorites
+// handles user's favorite waypoints (currently not used in app)
 export const favoriteService = {
-  // Add a favorite location
+  // saves a waypoint as favorite for a user
   async addFavorite(userId: string, waypointId: string) {
     try {
       const docRef = await addDoc(collection(db, 'favorites'), {
@@ -259,7 +259,7 @@ export const favoriteService = {
     }
   },
 
-  // Get user's favorites
+  // retrieves all favorites for a specific user
   async getUserFavorites(userId: string) {
     try {
       const querySnapshot = await getDocs(collection(db, 'favorites'));

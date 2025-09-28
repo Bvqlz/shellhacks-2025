@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { Waypoint, Coordinate, WaypointFormData } from '../types';
 
+// props for the waypoint creation/editing modal
 interface AddWaypointModalProps {
   visible: boolean;
   isEditing: boolean;
@@ -19,6 +20,7 @@ interface AddWaypointModalProps {
   onCancel: () => void;
 }
 
+// modal popup for creating new waypoints or editing existing ones
 export const AddWaypointModal: React.FC<AddWaypointModalProps> = ({
   visible,
   isEditing,
@@ -31,7 +33,7 @@ export const AddWaypointModal: React.FC<AddWaypointModalProps> = ({
   const [waypointName, setWaypointName] = useState('');
   const [waypointDescription, setWaypointDescription] = useState('');
 
-  // Reset form when modal opens/closes or editing waypoint changes
+  // pre-fills form with existing data when editing, clears when creating new
   useEffect(() => {
     if (visible && isEditing && editingWaypoint) {
       setWaypointName(editingWaypoint.name);
@@ -42,6 +44,7 @@ export const AddWaypointModal: React.FC<AddWaypointModalProps> = ({
     }
   }, [visible, isEditing, editingWaypoint]);
 
+  // submits form data to either create new or update existing waypoint
   const handleSubmit = async () => {
     const formData: WaypointFormData = {
       name: waypointName,
@@ -154,7 +157,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
-  },
+  }, 
   modalContainer: {
     backgroundColor: 'white',
     borderRadius: 15,
