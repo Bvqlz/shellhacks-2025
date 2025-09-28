@@ -13,6 +13,7 @@ interface Waypoint {
   longitude: number;
   description: string;
   createdAt: string;
+  createdBy: string;
 }
 
 export default function Index() {
@@ -61,7 +62,7 @@ export default function Index() {
       longitude: -80.1918, // Miami longitude
       description: "This is a sample waypoint for " + user.email,
       category: "sample",
-      isPublic: false
+      createdBy: user.email || 'Anonymous User'
     });
 
     if (result.success) {

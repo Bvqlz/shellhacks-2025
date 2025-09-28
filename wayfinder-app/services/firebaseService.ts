@@ -20,6 +20,7 @@ interface Waypoint {
   longitude: number;
   description: string;
   createdAt: string;
+  createdBy: string;
 }
 
 interface Favorite {
@@ -31,8 +32,8 @@ interface Favorite {
 
 // Simple service for managing waypoints/locations
 export const waypointService = {
-  // Add a new waypoint for a specific user
-  async addWaypoint(userId: string, name: string, latitude: number, longitude: number, description?: string) {
+  // Add a new waypoint for a specific user (all waypoints are public)
+  async addWaypoint(userId: string, name: string, latitude: number, longitude: number, description?: string, createdBy?: string) {
     try {
       const docRef = await addDoc(collection(db, 'waypoints'), {
         userId, // Link waypoint to user
@@ -40,6 +41,7 @@ export const waypointService = {
         latitude,
         longitude,
         description: description || '',
+        createdBy: createdBy || 'Anonymous User',
         createdAt: new Date().toISOString(),
       });
       console.log('Waypoint added with ID: ', docRef.id);
@@ -76,6 +78,32 @@ export const waypointService = {
     }
   },
 
+  // Get all waypoints (all waypoints are public)
+  async getAllVisibleWaypoints(userId: string) {
+    try {
+      const querySnapshot = await getDocs(collection(db, 'waypoints'));
+      const waypoints: Waypoint[] = [];
+      
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        
+        // All waypoints are public, so return all waypoints
+        waypoints.push({
+          id: doc.id,
+          ...data
+        } as Waypoint);
+      });
+      
+      // Sort by creation date (newest first)
+      waypoints.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      
+      return waypoints;
+    } catch (error) {
+      console.error('Error getting visible waypoints: ', error);
+      throw error;
+    }
+  },
+
   // Create waypoint from form data (easy for your teammate to use)
   async createWaypointFromForm(formData: {
     userId: string;
@@ -84,7 +112,7 @@ export const waypointService = {
     longitude: number;
     description?: string;
     category?: string;
-    isPublic?: boolean;
+    createdBy?: string;
   }) {
     try {
       // Validate required fields
@@ -99,7 +127,7 @@ export const waypointService = {
         longitude: Number(formData.longitude),
         description: formData.description?.trim() || '',
         category: formData.category || 'general',
-        isPublic: formData.isPublic || false,
+        createdBy: formData.createdBy || 'Anonymous User',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
@@ -123,15 +151,32 @@ export const waypointService = {
   },
 
   // Update an existing waypoint
-  async updateWaypoint(waypointId: string, updates: {
+  async updateWaypoint(waypointId: string, userId: string, updates: {
     name?: string;
     latitude?: number;
     longitude?: number;
     description?: string;
     category?: string;
-    isPublic?: boolean;
   }) {
     try {
+      // First check if the waypoint belongs to the user
+      const waypointDoc = await getDoc(doc(db, 'waypoints', waypointId));
+      
+      if (!waypointDoc.exists()) {
+        return {
+          success: false,
+          message: 'Waypoint not found'
+        };
+      }
+
+      const waypointData = waypointDoc.data();
+      if (waypointData.userId !== userId) {
+        return {
+          success: false,
+          message: 'You can only update your own waypoints'
+        };
+      }
+
       const updateData: any = {
         updatedAt: new Date().toISOString()
       };
@@ -142,7 +187,6 @@ export const waypointService = {
       if (updates.longitude !== undefined) updateData.longitude = Number(updates.longitude);
       if (updates.description !== undefined) updateData.description = updates.description.trim();
       if (updates.category) updateData.category = updates.category;
-      if (updates.isPublic !== undefined) updateData.isPublic = updates.isPublic;
 
       await updateDoc(doc(db, 'waypoints', waypointId), updateData);
       
